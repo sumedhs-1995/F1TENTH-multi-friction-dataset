@@ -231,7 +231,7 @@ if __name__ == '__main__':
         '-s', '--steering',
         metavar='STEERING',
         dest='steering',
-        default=0.2094,
+        default=1.0,
         help='set steering limit [0, 0.5236] rad')
     argparser.add_argument(
         '-tn', '--throttle_noise',
@@ -249,8 +249,8 @@ if __name__ == '__main__':
     t_start = time.time_ns() # Record starting time
     maneuver = 'skidpad' # Load maneuver
     direction = 'ccw'# Load maneuver direction
-    throttle = 0.02# Load throttle limit
-    steering = 1.0 # Load steering limit
+    throttle = args.throttle# Load throttle limit
+    steering = args.steering # Load steering limit
     throttle_noise = float(args.throttle_noise) # Load throttle std dev
     steering_noise = float(args.steering_noise) # Load steering std dev
     settings = None
