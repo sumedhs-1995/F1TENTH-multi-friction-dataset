@@ -184,9 +184,9 @@ def bridge(sid, data):
         else:
             roboracer_1.cosim_mode = 0
             roboracer_1.throttle_command = throttle_cmd         # Throttle [-1, 1]
-            roboracer_1.steering_command = steering_cmd  # Steering [-1, 1]
+            roboracer_1.steering_command = -steering_cmd  # Steering [-1, 1]
             # print(steering_cmd, throttle_cmd)
-            asyncio.run(DataRecorder(roboracer_1))
+            # asyncio.run(DataRecorder(roboracer_1))
     
         # Reset command
         roboracer_1.reset_command = False # Reset {True, False}
@@ -245,8 +245,8 @@ if __name__ == '__main__':
     args = argparser.parse_args()   # Parse the command line arguments (CLIs)
     t_start = time.time_ns()        # Record starting time
     maneuver = 'skidpad'            # Load maneuver
-    direction = 'ccw'               # Load maneuver direction
-    throttle = 0.02                 # Load throttle limit
+    direction = 'cw'               # Load maneuver direction
+    throttle = 0.06                 # Load throttle limit
     steering = 0.2                  # Load steering limit
     throttle_noise = float(args.throttle_noise) # Load throttle std dev
     steering_noise = float(args.steering_noise) # Load steering std dev
