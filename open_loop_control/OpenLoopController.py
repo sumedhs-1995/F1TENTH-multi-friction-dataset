@@ -97,7 +97,7 @@ def bridge(sid, data):
         '''
         global maneuver_completion_status
         if maneuver == 'straight':
-            t_straight = 90e9 # Time for straight maneuver
+            t_straight = 100e9 # Time for straight maneuver
             # Straight
             if (time.time_ns() - t_start) <= t_straight:
                 throttle_cmd = throttle + np.random.normal(0,throttle_noise) # Constant throttle (with noise)
@@ -127,8 +127,9 @@ def bridge(sid, data):
         ################################################################################
         # Fishhook maneuver (constant throttle and ramp steering)
         elif maneuver == 'fishhook':
-            t_fishhook = 90e9 # Time for fishhook maneuver
-            k_fishhook = 6e-12 # Controls steering rate (e.g. 1e-11 steers slower than 1e-10)
+            t_fishhook = 100e9 # Time for fishhook maneuver
+            # k_fishhook = 6e-12 # Controls steering rate (e.g. 1e-11 steers slower than 1e-10)
+            k_fishhook = 1/t_fishhook
             # Fishhook
             if (time.time_ns() - t_start) <= t_fishhook:
                 throttle_cmd = throttle + np.random.normal(0,throttle_noise) # Constant throttle (with noise)
@@ -143,20 +144,20 @@ def bridge(sid, data):
         ################################################################################
         # Slalom maneuver (constant throttle and sinusoidal steering)
         elif maneuver == 'slalom':
-            t_straight = 3e9 # Time for driving straight
+            t_straight = 0.0e9 # Time for driving straight
             #t_straight = (0.5/throttle)*1e9 # Throttle-dependent time for driving straight
-            t_slalom = 90e9 # Time for slalom maneuver
+            t_slalom = 100e9 # Time for slalom maneuver
             #t_slalom = (5/throttle)*1e9 # Throttle-dependent time for slalom maneuver
             k_slalom = 9e-10 # Controls steering rate (e.g. 9e-10 steers slower than 1e-9)
             # Straight
-            if (time.time_ns() - t_start) <= t_straight:
-                throttle_cmd = throttle + np.random.normal(0,throttle_noise) # Constant throttle (with noise)
-                steering_cmd = 0 + np.random.normal(0,steering_noise) # Zero steering (with noise)
-                print("Time : {:.4f} sec | Throttle : {:.2f} % | Steering : {:.4f} rad".format((time.time_ns()-t_start)/1e9, throttle_cmd*100, min(steering_cmd, 0.5236))) # Verbose
+            # if (time.time_ns() - t_start) <= t_straight:
+            #     throttle_cmd = throttle + np.random.normal(0,throttle_noise) # Constant throttle (with noise)
+            #     steering_cmd = 0 + np.random.normal(0,steering_noise) # Zero steering (with noise)
+            #     print("Time : {:.4f} sec | Throttle : {:.2f} % | Steering : {:.4f} rad".format((time.time_ns()-t_start)/1e9, throttle_cmd*100, min(steering_cmd, 0.5236))) # Verbose
             # Slalom
-            elif (time.time_ns() - t_start) > t_straight and (time.time_ns() - t_start) <= (t_straight + t_slalom):
+            if (time.time_ns() - t_start) <= t_slalom:
                 throttle_cmd = throttle + np.random.normal(0,throttle_noise) # Constant throttle (with noise)
-                steering_cmd = steering*np.cos(k_slalom*(time.time_ns() - (t_start + t_straight))) + np.random.normal(0,steering_noise) # Time-dependent sinusoidal steering (with noise)
+                steering_cmd = 1.0*np.sin((4*np.pi/t_slalom)*(time.time_ns() - t_start)) + np.random.normal(0,steering_noise) # Time-dependent sinusoidal steering (with noise)
                 print("Time : {:.4f} sec | Throttle : {:.2f} % | Steering : {:.4f} rad".format((time.time_ns()-t_start)/1e9, throttle_cmd*100, min(steering_cmd, 0.5236))) # Verbose
             # Stop
             else:
@@ -183,8 +184,8 @@ def bridge(sid, data):
         
         else:
             roboracer_1.cosim_mode = 0
-            roboracer_1.throttle_command = throttle_cmd         # Throttle [-1, 1]
-            roboracer_1.steering_command = -steering_cmd  # Steering [-1, 1]
+            roboracer_1.throttle_command = throttle_cmd  # Throttle [-1, 1]
+            roboracer_1.steering_command = steering_cmd  # Steering [-1, 1]
             # print(steering_cmd, throttle_cmd)
             # asyncio.run(DataRecorder(roboracer_1))
     
@@ -244,10 +245,10 @@ if __name__ == '__main__':
         help='set std dev for noisy steering [0.001, 0.1] rad')
     args = argparser.parse_args()   # Parse the command line arguments (CLIs)
     t_start = time.time_ns()        # Record starting time
-    maneuver = 'skidpad'            # Load maneuver
-    direction = 'cw'               # Load maneuver direction
-    throttle = 0.06                 # Load throttle limit
-    steering = 0.2                  # Load steering limit
+    maneuver = 'straight'            # Load maneuver
+    direction = 'ccw'               # Load maneuver direction
+    throttle = 0.10                 # Load throttle limit
+    steering = args.steering                  # Load steering limit
     throttle_noise = float(args.throttle_noise) # Load throttle std dev
     steering_noise = float(args.steering_noise) # Load steering std dev
     settings = None
