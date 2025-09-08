@@ -144,20 +144,21 @@ def bridge(sid, data):
         ################################################################################
         # Slalom maneuver (constant throttle and sinusoidal steering)
         elif maneuver == 'slalom':
-            t_straight = 0.0e9 # Time for driving straight
+            t_straight = 10e9 # Time for driving straight
             #t_straight = (0.5/throttle)*1e9 # Throttle-dependent time for driving straight
             t_slalom = 100e9 # Time for slalom maneuver
             #t_slalom = (5/throttle)*1e9 # Throttle-dependent time for slalom maneuver
             k_slalom = 9e-10 # Controls steering rate (e.g. 9e-10 steers slower than 1e-9)
             # Straight
-            # if (time.time_ns() - t_start) <= t_straight:
-            #     throttle_cmd = throttle + np.random.normal(0,throttle_noise) # Constant throttle (with noise)
-            #     steering_cmd = 0 + np.random.normal(0,steering_noise) # Zero steering (with noise)
-            #     print("Time : {:.4f} sec | Throttle : {:.2f} % | Steering : {:.4f} rad".format((time.time_ns()-t_start)/1e9, throttle_cmd*100, min(steering_cmd, 0.5236))) # Verbose
-            # Slalom
-            if (time.time_ns() - t_start) <= t_slalom:
+            if (time.time_ns() - t_start) < t_straight:
+                print(True)
                 throttle_cmd = throttle + np.random.normal(0,throttle_noise) # Constant throttle (with noise)
-                steering_cmd = 1.0*np.sin((4*np.pi/t_slalom)*(time.time_ns() - t_start)) + np.random.normal(0,steering_noise) # Time-dependent sinusoidal steering (with noise)
+                steering_cmd = 0 + np.random.normal(0,steering_noise) # Zero steering (with noise)
+                print("Time : {:.4f} sec | Throttle : {:.2f} % | Steering : {:.4f} rad".format((time.time_ns()-t_start)/1e9, throttle_cmd*100, min(steering_cmd, 0.5236))) # Verbose
+            # Slalom
+            elif (time.time_ns() - t_start) >= t_straight and (time.time_ns() - t_start)<= t_slalom:
+                throttle_cmd = throttle + np.random.normal(0,throttle_noise) # Constant throttle (with noise)
+                steering_cmd = 1.0*np.cos((4*np.pi/(t_slalom - t_straight))*(time.time_ns() - (t_start + t_straight))) + np.random.normal(0,steering_noise) # Time-dependent sinusoidal steering (with noise)
                 print("Time : {:.4f} sec | Throttle : {:.2f} % | Steering : {:.4f} rad".format((time.time_ns()-t_start)/1e9, throttle_cmd*100, min(steering_cmd, 0.5236))) # Verbose
             # Stop
             else:
@@ -245,10 +246,10 @@ if __name__ == '__main__':
         help='set std dev for noisy steering [0.001, 0.1] rad')
     args = argparser.parse_args()   # Parse the command line arguments (CLIs)
     t_start = time.time_ns()        # Record starting time
-    maneuver = 'skidpad'            # Load maneuver
+    maneuver = 'slalom'            # Load maneuver
     direction = 'cw'               # Load maneuver direction
-    throttle = 0.10                 # Load throttle limit
-    steering = 1.0                 # Load steering limit
+    throttle = 0.04                 # Load throttle limit
+    steering = args.steering                 # Load steering limit
     throttle_noise = float(args.throttle_noise) # Load throttle std dev
     steering_noise = float(args.steering_noise) # Load steering std dev
     settings = None
