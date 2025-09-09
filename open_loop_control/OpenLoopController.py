@@ -173,20 +173,20 @@ def bridge(sid, data):
             # Co-simulation mode
             roboracer_1.cosim_mode = 1
             # Pose commands (only if cosim_mode==1)
-            roboracer_1.posX_command = -100.0
+            roboracer_1.posX_command = 100.0
             roboracer_1.posY_command = 100.0
             roboracer_1.posZ_command = 0.01
             roboracer_1.rotX_command = 0.0
             roboracer_1.rotY_command = 0.0
-            roboracer_1.rotZ_command = 0.9239
-            roboracer_1.rotW_command = 0.3827
+            roboracer_1.rotZ_command = 0.3827
+            roboracer_1.rotW_command = 0.9239
             position_set = True
         # Control commands (only if cosim_mode==0)
         
         else:
             roboracer_1.cosim_mode = 0
             roboracer_1.throttle_command = throttle_cmd  # Throttle [-1, 1]
-            roboracer_1.steering_command = -steering_cmd  # Steering [-1, 1]
+            roboracer_1.steering_command = steering_cmd  # Steering [-1, 1]
             # print(steering_cmd, throttle_cmd)
             # asyncio.run(DataRecorder(roboracer_1))
     
@@ -247,9 +247,9 @@ if __name__ == '__main__':
     args = argparser.parse_args()   # Parse the command line arguments (CLIs)
     t_start = time.time_ns()        # Record starting time
     maneuver = 'slalom'            # Load maneuver
-    direction = 'cw'               # Load maneuver direction
-    throttle = 0.04                 # Load throttle limit
-    steering = args.steering                 # Load steering limit
+    direction = 'ccw'               # Load maneuver direction
+    throttle = 0.10                 # Load throttle limit
+    steering = args.steering                # Load steering limit
     throttle_noise = float(args.throttle_noise) # Load throttle std dev
     steering_noise = float(args.steering_noise) # Load steering std dev
     settings = None
