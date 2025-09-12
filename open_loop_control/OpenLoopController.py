@@ -248,8 +248,8 @@ if __name__ == '__main__':
     t_start = time.time_ns()        # Record starting time
     maneuver = 'skidpad'            # Load maneuver
     direction = 'cw'               # Load maneuver direction
-    throttle = 0.02                 # Load throttle limit
-    steering = 0.2                # Load steering limit
+    throttle = 0.08                 # Load throttle limit
+    steering = 0.8                # Load steering limit
     throttle_noise = float(args.throttle_noise) # Load throttle std dev
     steering_noise = float(args.steering_noise) # Load steering std dev
     settings = None
